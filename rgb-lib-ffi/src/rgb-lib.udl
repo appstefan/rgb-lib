@@ -117,10 +117,10 @@ interface ConsignmentEndpoint {
   [Throws=RgbLibError]
   constructor(string consignment_endpoint);
 
-  ConsignmentEndpointProtocol protocol();
+  ConsignmentEndpointProtocolType protocol();
 };
 
-enum ConsignmentEndpointProtocol {
+enum ConsignmentEndpointProtocolType {
   "Storm",
   "RgbHttpJsonRpc",
 };
@@ -200,7 +200,7 @@ dictionary RgbAllocation {
 
 dictionary TransferConsignmentEndpoint {
   string endpoint;
-  ConsignmentEndpointProtocol protocol;
+  ConsignmentEndpointProtocolType protocol;
   boolean used;
 };
 

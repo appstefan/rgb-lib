@@ -100,7 +100,7 @@ use crate::database::entities::transfer_consignment_endpoint::{
     ActiveModel as DbTransferConsignmentEndpointActMod, Model as DbTransferConsignmentEndpoint,
 };
 use crate::database::entities::txo::{ActiveModel as DbTxoActMod, Model as DbTxo};
-use crate::database::enums::{ColoringType, ConsignmentEndpointProtocol, TransferStatus};
+use crate::database::enums::{ColoringType, ConsignmentEndpointProtocolType, TransferStatus};
 use crate::database::{
     DbData, LocalConsignmentEndpoint, LocalRecipient, LocalRgbAllocation, LocalUnspent,
     RgbLibDatabase, TransferData,
@@ -382,7 +382,7 @@ pub struct ConsignmentEndpoint {
     /// Endpoint address
     pub endpoint: String,
     /// Endpoint protocol
-    pub protocol: ConsignmentEndpointProtocol,
+    pub protocol: ConsignmentEndpointProtocolType,
 }
 
 impl ConsignmentEndpoint {
@@ -394,7 +394,7 @@ impl ConsignmentEndpoint {
     }
 
     /// Return the protocol of this consignment endpoint
-    pub fn protocol(&self) -> ConsignmentEndpointProtocol {
+    pub fn protocol(&self) -> ConsignmentEndpointProtocolType {
         self.protocol
     }
 }
@@ -406,11 +406,11 @@ impl TryFrom<InvoiceConsignmentEndpoint> for ConsignmentEndpoint {
         match x {
             InvoiceConsignmentEndpoint::Storm(addr) => Ok(ConsignmentEndpoint {
                 endpoint: addr.to_string(),
-                protocol: ConsignmentEndpointProtocol::Storm,
+                protocol: ConsignmentEndpointProtocolType::Storm,
             }),
             InvoiceConsignmentEndpoint::RgbHttpJsonRpc(addr) => Ok(ConsignmentEndpoint {
                 endpoint: addr,
-                protocol: ConsignmentEndpointProtocol::RgbHttpJsonRpc,
+                protocol: ConsignmentEndpointProtocolType::RgbHttpJsonRpc,
             }),
             _ => Err(Error::UnsupportedConsignmentEndpointProtocol),
         }
@@ -715,7 +715,7 @@ pub struct TransferConsignmentEndpoint {
     /// Endpoint address
     pub endpoint: String,
     /// Endpoint protocol
-    pub protocol: ConsignmentEndpointProtocol,
+    pub protocol: ConsignmentEndpointProtocolType,
     /// Whether the endpoint has been used
     pub used: bool,
 }
@@ -1344,7 +1344,7 @@ impl Wallet {
                 transfer_idx,
                 &LocalConsignmentEndpoint {
                     endpoint,
-                    protocol: ConsignmentEndpointProtocol::RgbHttpJsonRpc,
+                    protocol: ConsignmentEndpointProtocolType::RgbHttpJsonRpc,
                     used: false,
                     usable: true,
                 },
@@ -3828,7 +3828,7 @@ impl Wallet {
         for recipient in recipients {
             let mut found_valid = false;
             for consignment_endpoint in recipient.consignment_endpoints.iter_mut() {
-                if consignment_endpoint.protocol != ConsignmentEndpointProtocol::RgbHttpJsonRpc
+                if consignment_endpoint.protocol != ConsignmentEndpointProtocolType::RgbHttpJsonRpc
                     || !consignment_endpoint.usable
                 {
                     debug!(
@@ -4084,7 +4084,7 @@ impl Wallet {
                     match consignment_endpoint {
                         InvoiceConsignmentEndpoint::RgbHttpJsonRpc(url) => {
                             let mut local_consignment_endpoint = LocalConsignmentEndpoint {
-                                protocol: ConsignmentEndpointProtocol::RgbHttpJsonRpc,
+                                protocol: ConsignmentEndpointProtocolType::RgbHttpJsonRpc,
                                 endpoint: url.clone(),
                                 used: false,
                                 usable: false,
@@ -4101,7 +4101,7 @@ impl Wallet {
                         }
                         InvoiceConsignmentEndpoint::Storm(addr) => {
                             consignment_endpoints.push(LocalConsignmentEndpoint {
-                                protocol: ConsignmentEndpointProtocol::Storm,
+                                protocol: ConsignmentEndpointProtocolType::Storm,
                                 endpoint: addr.to_string(),
                                 used: false,
                                 usable: false,
